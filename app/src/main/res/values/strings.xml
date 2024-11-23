@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">SnoozeLoo</string>
+
+
+    <string name="close">Close</string>
+    <string name="save">Save</string>
+    <string name="alarm_name">Alarm Name</string>
+    <string name="alarm_ringtone">Alarm ringtone</string>
+    <string name="str_default">Default</string>
+    <string name="alarm_volume">Alarm Volume</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="repeat">Repeat</string>
+
 </resources>
