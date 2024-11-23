@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.snoozeloo.alarm.presentation.navigation.ListAndDetailPane
 import com.example.snoozeloo.ui.theme.SnoozeLooTheme
 
 class MainActivity : ComponentActivity()
@@ -54,25 +55,12 @@ class MainActivity : ComponentActivity()
 
         setContent {
             SnoozeLooTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(name = "Android", modifier = Modifier.padding(innerPadding))
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    ListAndDetailPane(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier)
-{
-    Text(text = "Hello $name!", modifier = modifier)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview()
-{
-    SnoozeLooTheme {
-        Greeting("Android")
     }
 }
