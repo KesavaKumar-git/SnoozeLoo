@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
 
     implementation(libs.androidx.compose.material3.adaptive.navigation)
+    implementation(libs.androidx.room.ktx)
 
 
     testImplementation(libs.junit)
