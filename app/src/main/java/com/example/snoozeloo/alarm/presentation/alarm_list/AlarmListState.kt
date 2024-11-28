@@ -4,5 +4,6 @@ import com.example.snoozeloo.alarm.presentation.models.AlarmUi
 
 data class AlarmListState(
     val alarms: List<AlarmUi> = emptyList(),
-    val selectedAlarm: AlarmUi? = null
+    val selectedAlarm: AlarmUi? = null,
+    val canPickRingtone: Boolean = false
 )
