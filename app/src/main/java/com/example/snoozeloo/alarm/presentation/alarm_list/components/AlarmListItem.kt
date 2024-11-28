@@ -1,5 +1,7 @@
 package com.example.snoozeloo.alarm.presentation.alarm_list.components
 
+import android.net.Uri
+import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,12 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.snoozeloo.R
 import com.example.snoozeloo.alarm.presentation.components.DaysChip
 import com.example.snoozeloo.alarm.presentation.components.LabelWithSwitch
+import com.example.snoozeloo.alarm.presentation.models.AlarmSound
 import com.example.snoozeloo.alarm.presentation.models.AlarmUi
 import com.example.snoozeloo.alarm.presentation.models.Days
 import com.example.snoozeloo.ui.theme.SnoozeLooTheme
@@ -36,7 +40,7 @@ fun AlarmListItem(
         ) {
             LabelWithSwitch(
                 label = alarmUi.alarmName,
-                isEnabled = alarmUi.isActive,
+                isChecked = alarmUi.isActive,
                 onChanged = {onClick()}
             )
 
@@ -49,16 +53,16 @@ fun AlarmListItem(
                     modifier = Modifier.padding(end = 5.dp)
                 )
 
-                if (!alarmUi.is24HrFormat)
+                if (!DateFormat.is24HourFormat(LocalContext.current))
                 {
                     Text(
-                        text = if (alarmUi.isAM) stringResource(R.string.am) else stringResource(R.string.pm),
+                        text = if (alarmUi.isAM == true) stringResource(R.string.am) else stringResource(R.string.pm),
                         style = MaterialTheme.typography.displaySmall
                     )
                 }
             }
 
-            DaysChip(modifier = Modifier.padding(top = 8.dp), selectedMap = alarmUi.selectedDays)
+            DaysChip(modifier = Modifier.padding(top = 8.dp), selectedMap = alarmUi.selectedDays, onClick = {})
         }
     }
 }
@@ -66,7 +70,7 @@ fun AlarmListItem(
 
 @PreviewLightDark
 @Composable
-fun AlarmListItemPreview(modifier: Modifier = Modifier)
+fun AlarmListItemPreview()
 {
     SnoozeLooTheme {
         Surface {
@@ -79,9 +83,9 @@ fun AlarmListItemPreview(modifier: Modifier = Modifier)
                         isActive = true,
                         timeFormatted = "10:00",
                         time = ZonedDateTime.now(),
-                        is24HrFormat = false,
                         isAM = false,
-                        selectedDays = HashMap<Days, Boolean>().apply { put(Days.Monday, true) }
+                        selectedDays = mutableSetOf(Days.Monday),
+                        alarmRingtone = AlarmSound(title = "Default", uri = Uri.parse(""))
                     ),
                     onClick = {}
                 )

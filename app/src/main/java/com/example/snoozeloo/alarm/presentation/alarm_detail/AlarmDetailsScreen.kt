@@ -1,6 +1,7 @@
 package com.example.snoozeloo.alarm.presentation.alarm_detail
 
-import android.transition.Slide
+import android.net.Uri
+import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -27,21 +29,25 @@ import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.snoozeloo.R
-import com.example.snoozeloo.alarm.presentation.alarm_list.AlarmListAction
+import com.example.snoozeloo.alarm.presentation.components.CommonAlertDialog
 import com.example.snoozeloo.alarm.presentation.components.DaysChip
 import com.example.snoozeloo.alarm.presentation.components.LabelValueCard
 import com.example.snoozeloo.alarm.presentation.components.LabelWithSwitch
+import com.example.snoozeloo.alarm.presentation.models.AlarmSound
 import com.example.snoozeloo.alarm.presentation.models.AlarmUi
 import com.example.snoozeloo.alarm.presentation.models.Days
 import com.example.snoozeloo.ui.theme.SnoozeLooTheme
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,15 +59,21 @@ fun AlarmDetailsScreen(
 ) {
     if (alarm != null)
     {
+        var canShowDialog by remember { mutableStateOf(false) }
+
         Column(
             modifier = modifier
+                .padding(16.dp)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
+
+            val timePickerState = rememberTimePickerState(
+                    initialHour = alarm.time.withZoneSameInstant(ZoneId.systemDefault()).hour,
+                    initialMinute = alarm.time.withZoneSameInstant(ZoneId.systemDefault()).minute,
+                    is24Hour = DateFormat.is24HourFormat(LocalContext.current))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -76,7 +88,7 @@ fun AlarmDetailsScreen(
                             color = MaterialTheme.colorScheme.primary,
                             shape = RoundedCornerShape(10.dp))
                         .padding(6.dp)
-                        .clickable { AlarmDetailAction.OnClose },
+                        .clickable { onAction(AlarmDetailAction.OnClose) },
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
 
@@ -100,12 +112,11 @@ fun AlarmDetailsScreen(
                     modifier = Modifier.padding(16.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val timePickerState = rememberTimePickerState(is24Hour = true)
                     TimeInput(state = timePickerState)
                 }
             }
 
-            LabelValueCard(label = stringResource(R.string.alarm_name), value = alarm.alarmName)
+            LabelValueCard(label = stringResource(R.string.alarm_name), value = alarm.alarmName, modifier = Modifier.clickable { canShowDialog = true })
 
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -120,11 +131,11 @@ fun AlarmDetailsScreen(
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    DaysChip(selectedMap = alarm.selectedDays)
+                    DaysChip(selectedMap = alarm.selectedDays, onClick = { days -> onAction(AlarmDetailAction.OnDaySelected(days)) })
                 }
             }
 
-            LabelValueCard(label = stringResource(R.string.alarm_ringtone), value = stringResource(R.string.str_default))
+            LabelValueCard(label = stringResource(R.string.alarm_ringtone), value = alarm.alarmRingtone?.title?: stringResource(R.string.str_default), modifier = Modifier.clickable { onAction(AlarmDetailAction.OnSelectRingtone) })
 
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -135,17 +146,13 @@ fun AlarmDetailsScreen(
                         text = stringResource(R.string.alarm_volume),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(top = 8.dp).padding(horizontal = 8.dp),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    val sliderPosition by remember { mutableFloatStateOf(0.8f) }
+                        color = MaterialTheme.colorScheme.onSurface)
 
                     Slider(
-                        value = sliderPosition,
-                        onValueChange = {},
-                        colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.secondary)
-                    )
-
+                        value = alarm.volume.toFloat(),
+                        onValueChange = { volumeLevel -> onAction(AlarmDetailAction.OnVolumeChanged(volumeLevel)) },
+                        colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.secondary),
+                        valueRange = 0f .. 100f)
                 }
             }
 
@@ -157,31 +164,46 @@ fun AlarmDetailsScreen(
                 ){
                     LabelWithSwitch(
                         label = stringResource(R.string.vibrate),
-                        isEnabled = alarm.isActive,
-                        onChanged = { }
+                        isChecked = alarm.shouldVibrate,
+                        onChanged = { isChecked -> onAction(AlarmDetailAction.OnVibrateToggled(isChecked)) }
                     )
                 }
             }
+        }
+
+        if (canShowDialog)
+        {
+            CommonAlertDialog(
+                title = stringResource(R.string.alarm_name),
+                value = alarm.alarmName,
+                onConfirm = {
+                    onAction(AlarmDetailAction.AlarmNameSelected(it))
+                    canShowDialog = false
+                },
+                onDismiss = { canShowDialog = false }
+            )
         }
     }
 }
 
 @PreviewLightDark
 @Composable
-fun AlarmDetailsScreenPreview(modifier: Modifier = Modifier)
+fun AlarmDetailsScreenPreview()
 {
     SnoozeLooTheme {
-        AlarmDetailsScreen(AlarmUi(
-            alarmName = "First Alarm",
-            isActive = true,
-            timeFormatted = "10:00",
-            time = ZonedDateTime.now(),
-            is24HrFormat = false,
-            isAM = false,
-            selectedDays = HashMap<Days, Boolean>().apply {
-                put(Days.Monday, true)
-            }),
-            onAction = {}
-        )
+        Scaffold { innerPadding ->
+            AlarmDetailsScreen(
+                alarm = AlarmUi(
+                    alarmName = "First Alarm",
+                    isActive = true,
+                    timeFormatted = "10:00",
+                    time = ZonedDateTime.now(),
+                    selectedDays = mutableSetOf(Days.Monday),
+                    alarmRingtone = AlarmSound(title = "Default", uri = Uri.parse(""))
+                ),
+                onAction = {},
+                modifier = Modifier.padding(innerPadding)
+            )
+        }
     }
 }
