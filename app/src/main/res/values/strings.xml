@@ -12,8 +12,11 @@
     <string name="repeat">Repeat</string>
     <string name="your_alarms">Your Alarms</string>
     <string name="alarm">alarm</string>
-    <string name="empty_screen_msg">It\'s empty! Add the first alarm so you\\n\" + \"don\'t miss an important moment!</string>
+    <string name="empty_screen_msg">It\'s empty! Add the first alarm so you \n don\'t miss an important moment!</string>
     <string name="am">AM</string>
     <string name="pm">PM</string>
+    <string name="create_alarm">Create Alarm</string>
+    <string name="back">Back</string>
+    <string name="selected">Selected</string>
 
 </resources>

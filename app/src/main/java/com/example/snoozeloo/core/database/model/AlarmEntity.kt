@@ -9,6 +9,5 @@ data class AlarmEntity(
     val time: Long,
     val timeFormatted: String,
     val isAM: Boolean,
-    val is24HrFormat: Boolean,
     val selectedDays: ArrayList<String>
 )
