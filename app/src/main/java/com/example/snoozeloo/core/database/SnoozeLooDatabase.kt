@@ -4,7 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.snoozeloo.core.database.model.AlarmEntity
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import com.example.snoozeloo.core.database.dao.AlarmsDao
+import com.example.snoozeloo.core.database.table_entities.AlarmEntity
+
 
 const val DB_VERSION = 1
 
@@ -13,8 +17,11 @@ const val DB_VERSION = 1
     version = DB_VERSION,
     exportSchema = false
 )
+@TypeConverters(StringListConverter::class)
 abstract class SnoozeLooDatabase: RoomDatabase()
 {
+    abstract fun alarmsDao(): AlarmsDao
+
     companion object
     {
         private var INSTANCE: SnoozeLooDatabase? = null
@@ -25,11 +32,23 @@ abstract class SnoozeLooDatabase: RoomDatabase()
             synchronized(Any())
             {
                 return INSTANCE ?: Room
-                    .databaseBuilder(context, SnoozeLooDatabase::class.java, "SnoozeLooDatabase")
+                    .databaseBuilder(context.applicationContext, SnoozeLooDatabase::class.java, "SnoozeLooDB")
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { INSTANCE = it }
             }
         }
+    }
+}
+
+class StringListConverter {
+    @TypeConverter
+    fun fromList(list: List<String>?): String? {
+        return list?.joinToString(",")
+    }
+
+    @TypeConverter
+    fun toList(data: String?): List<String>? {
+        return data?.split(",")?.filter { it.isNotBlank() }
     }
 }

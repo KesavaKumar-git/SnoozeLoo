@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
@@ -66,6 +67,9 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
 
     implementation(libs.androidx.compose.material3.adaptive.navigation)
+
+    implementation(libs.room.android)
+    kapt(libs.roomCompiler.android)
     implementation(libs.androidx.room.ktx)
 
 
