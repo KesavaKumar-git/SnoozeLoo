@@ -12,18 +12,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.ViewModelProvider
-import com.example.snoozeloo.alarm.presentation.alarm_list.AlarmViewModel
 import com.example.snoozeloo.alarm.presentation.navigation.ListAndDetailPane
 import com.example.snoozeloo.ui.theme.SnoozeLooTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity()
 {
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-
-        val viewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
 
         installSplashScreen().apply {
             setOnExitAnimationListener { screen ->
@@ -57,7 +55,7 @@ class MainActivity : ComponentActivity()
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
-                    ListAndDetailPane(modifier = Modifier.padding(innerPadding), viewModel = viewModel)
+                    ListAndDetailPane(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
