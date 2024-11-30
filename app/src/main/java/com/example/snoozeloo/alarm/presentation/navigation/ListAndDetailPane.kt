@@ -6,6 +6,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -14,7 +15,7 @@ import com.example.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailAction
 import com.example.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailsScreen
 import com.example.snoozeloo.alarm.presentation.alarm_list.AlarmListAction
 import com.example.snoozeloo.alarm.presentation.alarm_list.AlarmListScreen
-import com.example.snoozeloo.alarm.presentation.alarm_list.AlarmListViewModel
+import com.example.snoozeloo.alarm.presentation.alarm_list.AlarmViewModel
 import com.example.snoozeloo.alarm.presentation.ringtone_list.RingtoneListAction
 import com.example.snoozeloo.alarm.presentation.ringtone_list.RingtoneListScreen
 
@@ -22,11 +23,17 @@ import com.example.snoozeloo.alarm.presentation.ringtone_list.RingtoneListScreen
 @Composable
 fun ListAndDetailPane(
     modifier: Modifier = Modifier,
-    viewModel: AlarmListViewModel = AlarmListViewModel()
+    viewModel: AlarmViewModel
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+
+    LaunchedEffect(true) {
+        viewModel.getAlarms(context)
+    }
 
     NavigableListDetailPaneScaffold(
         navigator = navigator,
@@ -44,6 +51,8 @@ fun ListAndDetailPane(
                             {
                                 navigator.navigateTo(pane = ListDetailPaneScaffoldRole.Detail)
                             }
+
+                            is AlarmListAction.OnAlarmEnabled -> { }
                         }
                     }
                 )
