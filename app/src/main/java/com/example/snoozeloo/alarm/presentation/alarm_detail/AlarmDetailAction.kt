@@ -1,11 +1,12 @@
 package com.example.snoozeloo.alarm.presentation.alarm_detail
 
+import android.content.Context
 import com.example.snoozeloo.alarm.presentation.models.AlarmUi
 import com.example.snoozeloo.alarm.presentation.models.Days
 
 sealed interface AlarmDetailAction
 {
-    data class OnSaveAlarm(val alarm: AlarmUi): AlarmDetailAction
+    data class OnSaveAlarm(val context: Context, val alarm: AlarmUi): AlarmDetailAction
 
     data object OnClose: AlarmDetailAction
 

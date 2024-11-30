@@ -3,8 +3,11 @@ package com.example.snoozeloo.alarm.presentation.alarm_list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -33,13 +36,16 @@ fun AlarmListScreen(
     onAction: (action: AlarmListAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     Column(
-        modifier = modifier.padding(16.dp)
+        modifier = modifier
     ) {
         Text(
             text = stringResource(R.string.your_alarms),
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp).padding(horizontal = 16.dp)
         )
 
         if (state.alarms.isEmpty())
@@ -50,15 +56,19 @@ fun AlarmListScreen(
         {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(16.dp)
             ) {
-                items(state.alarms) { alarms ->
+                items(state.alarms) { alarm ->
 
                     AlarmListItem(
-                        alarmUi = alarms,
-                        onClick = { onAction(AlarmListAction.OnAlarmClick(alarms)) }
+                        alarmUi = alarm,
+                        onClick = { onAction(AlarmListAction.OnAlarmClick(alarm)) },
+                        onToggle = { isEnabled -> onAction(AlarmListAction.OnAlarmEnabled(context = context, alarm = alarm, isEnabled = isEnabled)) }
                     )
                 }
+
+                item { Spacer(Modifier.size(32.dp)) }
             }
         }
     }
@@ -66,14 +76,17 @@ fun AlarmListScreen(
     Box(
         modifier = modifier.padding(16.dp).fillMaxSize()
     ) {
-        val context = LocalContext.current
 
         FloatingActionButton(
             onClick = { onAction(AlarmListAction.OnAlarmCreate(context = context)) },
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp),
-            shape = CircleShape
+            shape = CircleShape,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.create_alarm))
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = stringResource(R.string.create_alarm))
         }
     }
 }

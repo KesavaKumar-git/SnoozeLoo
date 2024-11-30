@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -47,6 +49,8 @@ import com.example.snoozeloo.alarm.presentation.models.AlarmSound
 import com.example.snoozeloo.alarm.presentation.models.AlarmUi
 import com.example.snoozeloo.alarm.presentation.models.Days
 import com.example.snoozeloo.ui.theme.SnoozeLooTheme
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -59,6 +63,8 @@ fun AlarmDetailsScreen(
 ) {
     if (alarm != null)
     {
+        val context = LocalContext.current
+
         var canShowDialog by remember { mutableStateOf(false) }
 
         Column(
@@ -73,7 +79,7 @@ fun AlarmDetailsScreen(
             val timePickerState = rememberTimePickerState(
                     initialHour = alarm.time.withZoneSameInstant(ZoneId.systemDefault()).hour,
                     initialMinute = alarm.time.withZoneSameInstant(ZoneId.systemDefault()).minute,
-                    is24Hour = DateFormat.is24HourFormat(LocalContext.current))
+                    is24Hour = DateFormat.is24HourFormat(context))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -93,7 +99,14 @@ fun AlarmDetailsScreen(
                 )
 
                 TextButton(
-                    onClick = { onAction(AlarmDetailAction.OnSaveAlarm(alarm)) },
+                    onClick = {
+                        onAction(
+                            AlarmDetailAction.OnSaveAlarm(
+                                context = context,
+                                alarm = alarm.copy(time = ZonedDateTime.of(LocalDate.now(), LocalTime.of(timePickerState.hour, timePickerState.minute), ZoneId.systemDefault()))
+                            )
+                        )
+                    },
                     shape = RoundedCornerShape(15.dp),
                     colors = ButtonDefaults.textButtonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
@@ -116,7 +129,7 @@ fun AlarmDetailsScreen(
                 }
             }
 
-            LabelValueCard(label = stringResource(R.string.alarm_name), value = alarm.alarmName, modifier = Modifier.clickable { canShowDialog = true })
+            LabelValueCard(label = stringResource(R.string.alarm_name), value = alarm.alarmName, modifier = Modifier.clip(CardDefaults.shape).clickable { canShowDialog = true })
 
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -135,7 +148,7 @@ fun AlarmDetailsScreen(
                 }
             }
 
-            LabelValueCard(label = stringResource(R.string.alarm_ringtone), value = alarm.alarmRingtone?.title?: stringResource(R.string.str_default), modifier = Modifier.clickable { onAction(AlarmDetailAction.OnSelectRingtone) })
+            LabelValueCard(label = stringResource(R.string.alarm_ringtone), value = alarm.alarmRingtone?.title?: stringResource(R.string.str_default), modifier = Modifier.clip(CardDefaults.shape).clickable { onAction(AlarmDetailAction.OnSelectRingtone) })
 
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -196,7 +209,6 @@ fun AlarmDetailsScreenPreview()
                 alarm = AlarmUi(
                     alarmName = "First Alarm",
                     isActive = true,
-                    timeFormatted = "10:00",
                     time = ZonedDateTime.now(),
                     selectedDays = mutableSetOf(Days.Monday),
                     alarmRingtone = AlarmSound(title = "Default", uri = Uri.parse(""))

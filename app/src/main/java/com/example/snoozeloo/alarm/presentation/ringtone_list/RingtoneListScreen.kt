@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,13 +47,11 @@ fun RingtoneListScreen(
     if (selectAlarm)
     {
         Column(
-            modifier = modifier
-                .padding(16.dp)
-                .fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp).padding(top = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -60,8 +59,7 @@ fun RingtoneListScreen(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back),
                     modifier = Modifier
-                        .background(color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(10.dp))
+                        .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(10.dp))
                         .padding(6.dp)
                         .clickable { onAction(RingtoneListAction.OnClose) },
                     tint = MaterialTheme.colorScheme.onPrimary
@@ -69,8 +67,9 @@ fun RingtoneListScreen(
             }
 
             LazyColumn(
-                modifier = Modifier.padding(vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(vertical = 32.dp, horizontal = 16.dp)
             ) {
                 items(alarmRingtones) { ringtone ->
 
@@ -80,8 +79,8 @@ fun RingtoneListScreen(
                         Row (
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
-                                .clickable { onAction(RingtoneListAction.OnSelectRingtone(context = context, alarmSound = ringtone)) },
+                                .clickable { onAction(RingtoneListAction.OnSelectRingtone(context = context, alarmSound = ringtone)) }
+                                .padding(16.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -92,7 +91,7 @@ fun RingtoneListScreen(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
 
-                            if (ringtone == selectedRingtone)
+                            if (ringtone.uri == selectedRingtone?.uri)
                             {
                                 Image(
                                     painter = painterResource(R.drawable.ic_selected_rounded),
