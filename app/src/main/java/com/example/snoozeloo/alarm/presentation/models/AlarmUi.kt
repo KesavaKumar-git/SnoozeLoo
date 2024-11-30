@@ -6,19 +6,20 @@ import android.text.format.DateFormat
 import com.example.snoozeloo.core.database.table_entities.AlarmEntity
 import java.time.DayOfWeek
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 data class AlarmUi(
     val id: Int? = null,
-    val alarmName: String = "",
+    val alarmName: String = "Alarm",
     val isActive: Boolean = true,
-    val time: ZonedDateTime = ZonedDateTime.now(ZoneId.of("UTC")),
+    val time: ZonedDateTime = ZonedDateTime.now(ZoneId.of("UTC")).plusMinutes(1),
     val shouldVibrate: Boolean = true,
     val isAM: Boolean =  time.withZoneSameInstant(ZoneId.systemDefault()).hour < 12,
     val volume: Int = 80,
-    val selectedDays: MutableSet<Days> = mutableSetOf(),
+    val selectedDays: MutableSet<Days> = mutableSetOf(LocalDate.now().dayOfWeek.toDays()),
     val alarmRingtone: AlarmSound?
 )
 
@@ -29,26 +30,40 @@ data class AlarmSound(
 
 enum class Days(val displayableText: String)
 {
-    Monday("Mo"),
-    Tuesday("Tu"),
-    Wednesday("We"),
-    Thursday("Th"),
-    Friday("Fr"),
-    Saturday("Sa"),
-    Sunday("Su")
+    MONDAY("Mo"),
+    TUESDAY("Tu"),
+    WEDNESDAY("We"),
+    THURSDAY("Th"),
+    FRIDAY("Fr"),
+    SATURDAY("Sa"),
+    SUNDAY("Su")
 }
 
 fun Days.toDayOfWeek(): DayOfWeek
 {
     return when(this)
     {
-        Days.Monday -> DayOfWeek.MONDAY
-        Days.Tuesday -> DayOfWeek.TUESDAY
-        Days.Wednesday -> DayOfWeek.WEDNESDAY
-        Days.Thursday -> DayOfWeek.THURSDAY
-        Days.Friday -> DayOfWeek.FRIDAY
-        Days.Saturday -> DayOfWeek.SATURDAY
-        Days.Sunday -> DayOfWeek.SUNDAY
+        Days.MONDAY -> DayOfWeek.MONDAY
+        Days.TUESDAY -> DayOfWeek.TUESDAY
+        Days.WEDNESDAY -> DayOfWeek.WEDNESDAY
+        Days.THURSDAY -> DayOfWeek.THURSDAY
+        Days.FRIDAY -> DayOfWeek.FRIDAY
+        Days.SATURDAY -> DayOfWeek.SATURDAY
+        Days.SUNDAY -> DayOfWeek.SUNDAY
+    }
+}
+
+fun DayOfWeek.toDays(): Days
+{
+    return when(this)
+    {
+        DayOfWeek.MONDAY -> Days.MONDAY
+        DayOfWeek.TUESDAY -> Days.TUESDAY
+        DayOfWeek.WEDNESDAY -> Days.WEDNESDAY
+        DayOfWeek.THURSDAY -> Days.THURSDAY
+        DayOfWeek.FRIDAY -> Days.FRIDAY
+        DayOfWeek.SATURDAY -> Days.SATURDAY
+        DayOfWeek.SUNDAY -> Days.SUNDAY
     }
 }
 

@@ -19,21 +19,22 @@ class AlarmReceiver: BroadcastReceiver()
 {
     override fun onReceive(context: Context?, intent: Intent?)
     {
-        CoroutineScope(Dispatchers.IO).launch {
+        if (context != null)
+        {
 
-            if (context != null)
-            {
+            CoroutineScope(Dispatchers.IO).launch {
+
                 intent?.getIntExtra("alarm_id", -1)?.let {
 
                     if (it != -1 && SnoozeLooDatabase.getInstance(context).alarmsDao().isAlarmActive(it))
                     {
                         val snoozeScreen = Intent(context, SnoozeActivity::class.java)
-                        snoozeScreen.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        snoozeScreen.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         snoozeScreen.putExtra("alarm_id", it)
 
                         context.startActivity(snoozeScreen)
 
-                        postNotification(context, it, intent.getStringExtra("alarm_time")?: "")
+                        postNotification(context, it, intent.getStringExtra("alarm_time") ?: "")
                     }
                 }
             }

@@ -38,8 +38,12 @@
             android:showOnLockScreen="true"
             android:turnScreenOn="true"
             android:excludeFromRecents="true"
+            android:exported="true"
+            android:showWhenLocked="true"
+            android:launchMode="singleInstance"
             android:label="@string/title_activity_snooze"
-            android:theme="@style/Theme.SnoozeLoo" />
+            android:theme="@style/Theme.SnoozeLoo"
+            />
 
         <receiver android:name=".core.receiver.AlarmReceiver"
             android:exported="true"/>

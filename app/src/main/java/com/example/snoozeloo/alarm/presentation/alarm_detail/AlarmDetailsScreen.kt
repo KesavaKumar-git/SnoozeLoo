@@ -207,7 +207,7 @@ fun AlarmDetailsScreenPreview()
                     alarmName = "First Alarm",
                     isActive = true,
                     time = ZonedDateTime.now(),
-                    selectedDays = mutableSetOf(Days.Monday),
+                    selectedDays = mutableSetOf(Days.MONDAY),
                     alarmRingtone = AlarmSound(title = "Default", uri = Uri.parse(""))
                 ),
                 onAction = {},

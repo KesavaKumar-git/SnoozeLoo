@@ -14,7 +14,7 @@ interface AlarmsDao
     fun getAlarmList(): Flow<List<AlarmEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(alarm: AlarmEntity)
+    suspend fun insert(alarm: AlarmEntity): Long
 
     @Query("UPDATE alarms SET isActive = :isActive WHERE _id = :id")
     suspend fun toggleAlarm(isActive: Boolean, id: Int)

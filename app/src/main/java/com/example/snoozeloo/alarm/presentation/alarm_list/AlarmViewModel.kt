@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,7 +68,7 @@ class AlarmViewModel @Inject constructor(@ApplicationContext var context: Contex
 
             is AlarmListAction.OnAlarmCreate ->
             {
-                _state.update { it.copy(selectedAlarm = AlarmUi(alarmName = "", alarmRingtone = RingtoneManagerUtil.getDefaultAlarmSound(context = context) )) }
+                _state.update { it.copy(selectedAlarm = AlarmUi(alarmRingtone = RingtoneManagerUtil.getDefaultAlarmSound(context = context) )) }
             }
 
             is AlarmListAction.OnAlarmEnabled ->
@@ -84,7 +85,7 @@ class AlarmViewModel @Inject constructor(@ApplicationContext var context: Contex
                 }
                 else
                 {
-                    AlarmConfigureManager.cancelAlarm(context = context, id = action.alarm.id ?: -1)
+                    AlarmConfigureManager.cancelAlarm(context = context, alarmUi = action.alarm)
                 }
             }
         }
@@ -96,12 +97,12 @@ class AlarmViewModel @Inject constructor(@ApplicationContext var context: Contex
         {
             is AlarmDetailAction.OnSaveAlarm ->
             {
+                val alrm = action.alarm.toAlarmEntity()
                 _state.update { it.copy(selectedAlarm = null) }
-                viewModelScope.launch {
-                    alarmsDao.insert(action.alarm.toAlarmEntity())
-                }
 
-                configureAlarmForAllDays(context = context, alarm = action.alarm)
+                viewModelScope.launch {
+                    configureAlarmForAllDays(context = context, alarm = action.alarm.copy(id = alarmsDao.insert(alrm).toInt()))
+                }
             }
 
             is AlarmDetailAction.OnClose ->
@@ -191,6 +192,7 @@ class AlarmViewModel @Inject constructor(@ApplicationContext var context: Contex
 
             is AlarmSnoozeAction.OnAlarmLaunch ->
             {
+                AlarmConfigureManager.configureAlarm(context = context, time = action.alarmUi.time, dayOfWeek = LocalDate.now().dayOfWeek, id = action.alarmUi.id ?: -1)
                 RingtoneManagerUtil.playRingtone(context = action.context, ringtoneUri = action.alarmUi.alarmRingtone?.uri, volume = (action.alarmUi.volume/100f))
             }
         }

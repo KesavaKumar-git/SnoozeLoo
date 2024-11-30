@@ -93,7 +93,7 @@ fun AlarmListItemPreview()
                         isActive = true,
                         time = ZonedDateTime.now(),
                         isAM = false,
-                        selectedDays = mutableSetOf(Days.Monday),
+                        selectedDays = mutableSetOf(Days.MONDAY),
                         alarmRingtone = AlarmSound(title = "Default", uri = Uri.parse(""))
                     ),
                     onClick = {},
