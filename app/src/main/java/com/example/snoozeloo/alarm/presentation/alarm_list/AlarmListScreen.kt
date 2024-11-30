@@ -36,7 +36,6 @@ fun AlarmListScreen(
     onAction: (action: AlarmListAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -64,7 +63,7 @@ fun AlarmListScreen(
                     AlarmListItem(
                         alarmUi = alarm,
                         onClick = { onAction(AlarmListAction.OnAlarmClick(alarm)) },
-                        onToggle = { isEnabled -> onAction(AlarmListAction.OnAlarmEnabled(context = context, alarm = alarm, isEnabled = isEnabled)) }
+                        onToggle = { isEnabled -> onAction(AlarmListAction.OnAlarmEnabled(alarm = alarm, isEnabled = isEnabled)) }
                     )
                 }
 
@@ -78,7 +77,7 @@ fun AlarmListScreen(
     ) {
 
         FloatingActionButton(
-            onClick = { onAction(AlarmListAction.OnAlarmCreate(context = context)) },
+            onClick = { onAction(AlarmListAction.OnAlarmCreate) },
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp),
             shape = CircleShape,
             containerColor = MaterialTheme.colorScheme.primary,

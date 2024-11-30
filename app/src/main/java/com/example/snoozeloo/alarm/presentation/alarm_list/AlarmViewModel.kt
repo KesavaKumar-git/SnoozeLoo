@@ -10,38 +10,51 @@ import com.example.snoozeloo.alarm.presentation.models.AlarmUi
 import com.example.snoozeloo.alarm.presentation.models.toAlarmEntity
 import com.example.snoozeloo.alarm.presentation.models.toAlarmUi
 import com.example.snoozeloo.alarm.presentation.models.toDayOfWeek
-import com.example.snoozeloo.core.database.SnoozeLooDatabase
+import com.example.snoozeloo.core.database.dao.AlarmsDao
 import com.example.snoozeloo.core.domain.utils.AlarmConfigureManager
 import com.example.snoozeloo.core.presentation.utils.RingtoneManagerUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AlarmViewModel: ViewModel()
+@HiltViewModel
+class AlarmViewModel @Inject constructor(@ApplicationContext var context: Context, private val alarmsDao: AlarmsDao): ViewModel()
 {
     private val _state = MutableStateFlow(AlarmListState())
     val state = _state
-//        .onStart {  }
-//        .stateIn(
-//            viewModelScope,
-//            SharingStarted.WhileSubscribed(5000L),
-//            AlarmListState()
-//        )
+        .onStart { getAlarms() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            AlarmListState()
+        )
 
-    fun getAlarms(context: Context)
+    private val _snoozeScreenState: MutableStateFlow<AlarmUi?> = MutableStateFlow(null)
+    val snoozeScreenState = _snoozeScreenState.asStateFlow()
+
+    private fun getAlarms()
     {
         viewModelScope.launch {
-            SnoozeLooDatabase.getInstance(context = context).alarmsDao().getAlarmList().collectLatest { alarmList ->
+            alarmsDao.getAlarmList().collectLatest { alarmList ->
                 _state.update { it.copy(alarms = alarmList.map { it.toAlarmUi() })  }
             }
         }
     }
 
-    suspend fun getAlarm(id: Int, context: Context)
+    suspend fun getAlarm(id: Int)
     {
-        SnoozeLooDatabase.getInstance(context = context).alarmsDao().getAlarm(id).collectLatest { alarmList ->
-            _state.update { it.copy(selectedAlarm = alarmList?.toAlarmUi())  }
+        viewModelScope.launch {
+            alarmsDao.getAlarm(id).collectLatest { alarm ->
+                _snoozeScreenState.value = alarm?.toAlarmUi()
+            }
         }
     }
 
@@ -54,24 +67,24 @@ class AlarmViewModel: ViewModel()
 
             is AlarmListAction.OnAlarmCreate ->
             {
-                _state.update { it.copy(selectedAlarm = AlarmUi(alarmName = "", alarmRingtone = RingtoneManagerUtil.getDefaultAlarmSound(context = action.context) )) }
+                _state.update { it.copy(selectedAlarm = AlarmUi(alarmName = "", alarmRingtone = RingtoneManagerUtil.getDefaultAlarmSound(context = context) )) }
             }
 
             is AlarmListAction.OnAlarmEnabled ->
             {
                 viewModelScope.launch {
                     action.alarm.id?.let {
-                        SnoozeLooDatabase.getInstance(context = action.context).alarmsDao().toggleAlarm(action.isEnabled, it)
+                        alarmsDao.toggleAlarm(action.isEnabled, it)
                     }
                 }
 
                 if (action.isEnabled)
                 {
-                    configureAlarmForAllDays(context = action.context, alarm = action.alarm)
+                    configureAlarmForAllDays(context = context, alarm = action.alarm)
                 }
                 else
                 {
-                    AlarmConfigureManager.cancelAlarm(context = action.context, id = action.alarm.id ?: -1)
+                    AlarmConfigureManager.cancelAlarm(context = context, id = action.alarm.id ?: -1)
                 }
             }
         }
@@ -85,10 +98,10 @@ class AlarmViewModel: ViewModel()
             {
                 _state.update { it.copy(selectedAlarm = null) }
                 viewModelScope.launch {
-                    SnoozeLooDatabase.getInstance(context = action.context).alarmsDao().insert(action.alarm.toAlarmEntity())
+                    alarmsDao.insert(action.alarm.toAlarmEntity())
                 }
 
-                configureAlarmForAllDays(context = action.context, alarm = action.alarm)
+                configureAlarmForAllDays(context = context, alarm = action.alarm)
             }
 
             is AlarmDetailAction.OnClose ->
@@ -152,7 +165,7 @@ class AlarmViewModel: ViewModel()
             is RingtoneListAction.OnSelectRingtone ->
             {
                 _state.update { it.copy(selectedAlarm = it.selectedAlarm?.copy(alarmRingtone = action.alarmSound)) }
-                RingtoneManagerUtil.playRingtone(context = action.context, ringtoneUri = action.alarmSound.uri)
+                RingtoneManagerUtil.playRingtone(context = context, ringtoneUri = action.alarmSound.uri)
             }
 
             is RingtoneListAction.OnClose ->
@@ -168,7 +181,7 @@ class AlarmViewModel: ViewModel()
         {
             is AlarmSnoozeAction.OnAlarmSnooze ->
             {
-                AlarmConfigureManager.snoozeFor5Min(action.context, action.id, label = action.label)
+                AlarmConfigureManager.snoozeAfter5Min(context, action.id, label = action.label)
             }
 
             is AlarmSnoozeAction.OnAlarmTurnOff ->

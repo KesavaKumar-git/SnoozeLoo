@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateFormat
+import com.example.snoozeloo.core.presentation.utils.RingtoneManagerUtil
 import com.example.snoozeloo.core.receiver.AlarmReceiver
 import java.time.DayOfWeek
 import java.time.ZoneId
@@ -55,8 +56,10 @@ object AlarmConfigureManager
         alarmManager.cancel(pendingIntent)
     }
 
-    fun snoozeFor5Min(context: Context, id: Int, label: String)
+    fun snoozeAfter5Min(context: Context, id: Int, label: String)
     {
+        RingtoneManagerUtil.stopRingtone()
+
         val intent = Intent(context, AlarmReceiver::class.java)
         intent.putExtra("alarm_id", id)
         intent.putExtra("alarm_time", label)

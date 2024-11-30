@@ -42,7 +42,6 @@ fun RingtoneListScreen(
     onAction: (action: RingtoneListAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
 
     if (selectAlarm)
     {
@@ -79,7 +78,7 @@ fun RingtoneListScreen(
                         Row (
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onAction(RingtoneListAction.OnSelectRingtone(context = context, alarmSound = ringtone)) }
+                                .clickable { onAction(RingtoneListAction.OnSelectRingtone(alarmSound = ringtone)) }
                                 .padding(16.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically

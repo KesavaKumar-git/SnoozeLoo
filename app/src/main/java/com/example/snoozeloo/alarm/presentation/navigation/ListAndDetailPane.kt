@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailAction
 import com.example.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailsScreen
@@ -23,17 +24,11 @@ import com.example.snoozeloo.alarm.presentation.ringtone_list.RingtoneListScreen
 @Composable
 fun ListAndDetailPane(
     modifier: Modifier = Modifier,
-    viewModel: AlarmViewModel
+    viewModel: AlarmViewModel = hiltViewModel()
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    val context = LocalContext.current
-
-    LaunchedEffect(true) {
-        viewModel.getAlarms(context)
-    }
 
     NavigableListDetailPaneScaffold(
         navigator = navigator,

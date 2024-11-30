@@ -17,7 +17,7 @@ class NotificationActionReceiver: BroadcastReceiver()
                 intent.getStringExtra("notify_action").let { action ->
                     if (action == "remind_later")
                     {
-                        AlarmConfigureManager.snoozeFor5Min(context = context, id = it, label = intent.getStringExtra("alarm_time")?: "")
+                        AlarmConfigureManager.snoozeAfter5Min(context = context, id = it, label = intent.getStringExtra("alarm_time")?: "")
                     }
                     else if (action == "turn_off")
                     {

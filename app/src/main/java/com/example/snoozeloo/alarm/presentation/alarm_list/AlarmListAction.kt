@@ -7,7 +7,7 @@ sealed interface AlarmListAction
 {
     data class OnAlarmClick(val alarm: AlarmUi): AlarmListAction
 
-    data class OnAlarmCreate(val context: Context): AlarmListAction
+    data object OnAlarmCreate: AlarmListAction
 
-    data class OnAlarmEnabled(val context: Context, val alarm: AlarmUi, val isEnabled: Boolean): AlarmListAction
+    data class OnAlarmEnabled(val alarm: AlarmUi, val isEnabled: Boolean): AlarmListAction
 }

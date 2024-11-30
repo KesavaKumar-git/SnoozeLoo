@@ -89,7 +89,7 @@ fun AlarmSnoozeScreen(
             }
 
             Button(
-                onClick = { alarm.id?.let { onAction(AlarmSnoozeAction.OnAlarmSnooze(id = it, label = getLabelFormattedTime(context, alarm.time), context = context)) } },
+                onClick = { alarm.id?.let { onAction(AlarmSnoozeAction.OnAlarmSnooze(id = it, label = getLabelFormattedTime(context, alarm.time))) } },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)

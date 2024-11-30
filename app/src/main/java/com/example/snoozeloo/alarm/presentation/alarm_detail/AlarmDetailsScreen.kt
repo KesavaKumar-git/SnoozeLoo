@@ -101,10 +101,7 @@ fun AlarmDetailsScreen(
                 TextButton(
                     onClick = {
                         onAction(
-                            AlarmDetailAction.OnSaveAlarm(
-                                context = context,
-                                alarm = alarm.copy(time = ZonedDateTime.of(LocalDate.now(), LocalTime.of(timePickerState.hour, timePickerState.minute), ZoneId.systemDefault()))
-                            )
+                            AlarmDetailAction.OnSaveAlarm(alarm = alarm.copy(time = ZonedDateTime.of(LocalDate.now(), LocalTime.of(timePickerState.hour, timePickerState.minute), ZoneId.systemDefault())))
                         )
                     },
                     shape = RoundedCornerShape(15.dp),

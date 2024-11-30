@@ -7,7 +7,7 @@ sealed interface AlarmSnoozeAction
 {
     data object OnAlarmTurnOff: AlarmSnoozeAction
 
-    data class OnAlarmSnooze(val id: Int, val label: String, val context: Context): AlarmSnoozeAction
+    data class OnAlarmSnooze(val id: Int, val label: String): AlarmSnoozeAction
 
     data class OnAlarmLaunch(val alarmUi: AlarmUi, val context: Context): AlarmSnoozeAction
 }
