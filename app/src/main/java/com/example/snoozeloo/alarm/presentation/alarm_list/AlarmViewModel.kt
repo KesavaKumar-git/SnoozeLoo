@@ -12,6 +12,7 @@ import com.example.snoozeloo.alarm.presentation.models.toAlarmUi
 import com.example.snoozeloo.alarm.presentation.models.toDayOfWeek
 import com.example.snoozeloo.core.database.dao.AlarmsDao
 import com.example.snoozeloo.core.domain.utils.AlarmConfigureManager
+import com.example.snoozeloo.core.domain.utils.NotificationUtil
 import com.example.snoozeloo.core.presentation.utils.RingtoneManagerUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -173,6 +174,11 @@ class AlarmViewModel @Inject constructor(@ApplicationContext var context: Contex
             {
                 _state.update { it.copy(canPickRingtone = false) }
             }
+
+            is RingtoneListAction.OnStopRingtone ->
+            {
+                RingtoneManagerUtil.stopRingtone()
+            }
         }
     }
 
@@ -182,12 +188,14 @@ class AlarmViewModel @Inject constructor(@ApplicationContext var context: Contex
         {
             is AlarmSnoozeAction.OnAlarmSnooze ->
             {
-                AlarmConfigureManager.snoozeAfter5Min(context, action.id, label = action.label)
+                AlarmConfigureManager.snoozeAfter5Min(context = context, action.id, label = action.label)
+                NotificationUtil.removeNotification(context = context, notificationId = 1)
             }
 
             is AlarmSnoozeAction.OnAlarmTurnOff ->
             {
                 RingtoneManagerUtil.stopRingtone()
+                NotificationUtil.removeNotification(context = context, notificationId = 1)
             }
 
             is AlarmSnoozeAction.OnAlarmLaunch ->

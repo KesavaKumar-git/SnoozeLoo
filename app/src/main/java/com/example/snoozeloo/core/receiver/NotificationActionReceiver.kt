@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.example.snoozeloo.core.domain.utils.AlarmConfigureManager
+import com.example.snoozeloo.core.domain.utils.NotificationUtil
 import com.example.snoozeloo.core.presentation.utils.RingtoneManagerUtil
 
 class NotificationActionReceiver: BroadcastReceiver()
@@ -17,11 +18,13 @@ class NotificationActionReceiver: BroadcastReceiver()
                 intent.getStringExtra("notify_action").let { action ->
                     if (action == "remind_later")
                     {
-                        AlarmConfigureManager.snoozeAfter5Min(context = context, id = it, label = intent.getStringExtra("alarm_time")?: "")
+                        AlarmConfigureManager.snoozeAfter5Min(context = context, id = it, label = "Snoozed:" + intent.getStringExtra("alarm_time")?: "")
+                        NotificationUtil.removeNotification(context, 1)
                     }
                     else if (action == "turn_off")
                     {
                         RingtoneManagerUtil.stopRingtone()
+                        NotificationUtil.removeNotification(context, 1)
                     }
                 }
             }

@@ -8,4 +8,6 @@ interface RingtoneListAction
     data class OnSelectRingtone(val alarmSound: AlarmSound): RingtoneListAction
 
     data object OnClose: RingtoneListAction
+
+    data object OnStopRingtone: RingtoneListAction
 }

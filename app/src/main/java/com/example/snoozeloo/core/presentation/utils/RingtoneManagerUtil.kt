@@ -10,6 +10,10 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import com.example.snoozeloo.alarm.presentation.models.AlarmSound
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 object RingtoneManagerUtil
 {
@@ -74,6 +78,11 @@ object RingtoneManagerUtil
             vibrator = vibratorManager.defaultVibrator
 
             vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(500, 500), intArrayOf(255, 0), 0))
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(5 * 60 * 1000)
+            stopRingtone()
         }
     }
 
